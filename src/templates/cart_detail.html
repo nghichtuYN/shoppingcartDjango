@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container min-vh-100">
+    <h1 class="my-4">Giỏ hàng của bạn</h1>
+
+    <div class="row">
+      <div class="col-md-8">
+        {% if cart.cartitem_set.all %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Hình ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in cart.cartitem_set.all %}
+                <tr>
+                  <td><img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100px; height: auto;"></td>
+                  <td>{{ item.product.name }}</td>
+                  <td>{{ item.total_price}} VND</td>
+                  <td>
+                    <form method="POST" action="{% url 'update_cart_item' item.id %}">
+                      {% csrf_token %}
+                      <div class="input-group">
+                        <button class="btn btn-outline-secondary" name="action" value="decrease" type="submit">-</button>
+                        <input type="text" style="width: 5px;" class="form-control text-center" value="{{ item.quantity }}" readonly>
+                        <button class="btn btn-outline-secondary" name="action" value="increase" type="submit">+</button>
+                      </div>
+                    </form>
+                  </td>
+                  <td>
+                    <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                      {% csrf_token %}
+                      <button class="btn btn-danger" type="submit">Xóa</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p>Giỏ hàng của bạn đang trống.</p>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <h3>Tổng cộng: {{ cart.get_total_price }} VND</h3>
+        <a class="btn btn-success btn-lg w-100 mt-4">Tiến hành thanh toán</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}
